@@ -15,19 +15,21 @@ const routes = require('./routes');
 
 mongoose.Promise = promise;
 
+let connect_uri = null;
+
 (config.database.username)
-  ? mongoose.connect(`mongodb://${config.database.host}:${config.database.port}/${config.database.db}`)
-  : mongoose.connect(`mongodb://${config.database.username}:${config.database.password}@${config.database.host}:${config.database.port}/${config.database.db}`);
+  ? connect_uri = `mongodb://${config.database.host}:${config.database.port}/${config.database.db}`
+  : connect_uri = `mongodb://${config.database.username}:${config.database.password}@${config.database.host}:${config.database.port}/${config.database.db}`;
+
+mongoose.connect(connect_uri);
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(cors());
-
 app.set('socketio', io);
-
 app.use('/api', routes);
 
-mongoose.connection.on('open', () => console.log('Connected to database'));
+mongoose.connection.on('open', () => console.log('Connected to database', connect_uri));
 mongoose.connection.on('error', (err) => console.log('Error connecting to database', err));
 
 http.listen(config.server.port, () => console.log(`Server listens on port ${config.server.port}`));
