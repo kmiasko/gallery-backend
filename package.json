@@ -7,7 +7,7 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "start": "node --require dotenv/config app.js",
+    "start": "node app.js",
     "watch": "nodemon app.js --exec \"node --require dotenv/config\""
   },
   "keywords": [],
