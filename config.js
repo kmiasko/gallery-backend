@@ -8,7 +8,7 @@ const JWT_DEFAULT_SECRET = 'dumdumdum';
 
 module.exports = {
   server: {
-    port: process.env.API_SERVER_PORT || SERVER_DEFAULT_PORT,
+    port: process.env.PORT || SERVER_DEFAULT_PORT,
   },
   database: {
     host: process.env.API_DATABASE_HOST || DATABASE_DEFAULT_HOST,
