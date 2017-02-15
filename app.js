@@ -9,6 +9,7 @@ const cors = require('cors');
 const app = express();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
+const isEmpty = require('lodash/isEmpty');
 
 const config = require('./config');
 const routes = require('./routes');
@@ -17,7 +18,7 @@ mongoose.Promise = promise;
 
 let connect_uri = null;
 
-(config.database.username)
+(isEmpty(config.database.username))
   ? connect_uri = `mongodb://${config.database.host}:${config.database.port}/${config.database.db}`
   : connect_uri = `mongodb://${config.database.username}:${config.database.password}@${config.database.host}:${config.database.port}/${config.database.db}`;
 
