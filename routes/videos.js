@@ -1,36 +1,33 @@
 const videosRouter = require('express').Router();
+const promise = require('bluebird');
 const { Video, User } = require('../models');
-const { protected, videoOwner } = require('../middleware');
+const { protected, videoOwner, errors } = require('../middleware');
 
-videosRouter.get('/', protected, (req, res) => {
-  if (!res.locals.user_id) {
-    return res.status(401).json({ success: false, error: 'Forbidded' });
-  }
-
+videosRouter.get('/', protected, (req, res, next) => {
   const user_id = res.locals.user_id;
 
   User.findOne({ _id: user_id })
     .populate('videos')
     .then(user => {
       if (!user) {
-        return res.status(401).json({ success: false, error: 'Forbidded' });
+        return promise.reject(new errors.NotFound())
       }
       return res.json({ success: true, videos: user.videos });
     })
-    .catch(err => res.status(500).json({ success: false, error: err }));
+    .catch(err => next(err));
 });
 
-videosRouter.get('/feed', (req, res) => {
+videosRouter.get('/feed', (req, res, next) => {
   Video.feed()
     .then(feed => res.json({ success: true, feed }))
-    .catch(err => res.status(500).json({ error: err }));
+    .catch(err => next(err));
 });
 
-videosRouter.post('/', protected, (req, res) => {
+videosRouter.post('/', protected, (req, res, next) => {
   const io = req.app.get('socketio');
 
   if (!req.body) {
-    return res.status(400).json({ success: false, error: 'Empty body' });
+    next(new errors.BadRequest('Empty body'));
   }
 
   const { title, thumbnail } = req.body;
@@ -39,7 +36,7 @@ videosRouter.post('/', protected, (req, res) => {
   return User.findOne({ _id: res.locals.user_id })
     .then(user => {
       if (!user) {
-        return res.status(404).json({ success: false, error: 'Unknow user' });
+        promise.reject(new errors.NotFound());
       }
       return vid.save()
         .then((video) => {
@@ -52,11 +49,12 @@ videosRouter.post('/', protected, (req, res) => {
           }
         })
     })
+    .catch(err => next(err));
 });
 
 const ownerProtection = [protected, videoOwner];
 
-videosRouter.delete('/:id', ownerProtection, (req, res) => {
+videosRouter.delete('/:id', ownerProtection, (req, res, next) => {
   Video.findOne({ _id: req.params.id })
     .remove()
     .then(() => User.findOne({ _id: res.locals.user_id }))
@@ -66,19 +64,19 @@ videosRouter.delete('/:id', ownerProtection, (req, res) => {
       return user.save();
     })
     .then(() => res.json({ success: true }))
-    .catch(err => res.status(500).json({ success: false, error: err }));
+    .catch(err => next(err));
 });
 
-videosRouter.put('/:id', ownerProtection, (req, res) => {
+videosRouter.put('/:id', ownerProtection, (req, res, next) => {
   Video.findOne({ _id: req.params.id })
     .then(video => {
       if (!video) {
-        return res.status(404).json({ success: false, error: 'No such video' });
+        return promise.reject(new errors.NotFound());
       }
       return video.fav();
     })
     .then(video => res.json({ success: true, video }))
-    .catch(err => res.status(500).json({ success: false, error: err }));
+    .catch(err => next(err));
 });
 
 module.exports = videosRouter;

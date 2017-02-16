@@ -1,15 +1,11 @@
+const promise = require('bluebird');
+const { errors } = require('../middleware');
 const { User } = require('../models');
 
 const videoOwner = (req, res, next) => {
-  if (!res.locals.user_id) {
-    res.status(401).json({ success: false, error: 'You dont have access to resource' });
-    next();
-  }
-
   const videoid = req.params.id;
   if (!videoid) {
-    res.status(500).json({ success: false, error: 'Missing video id' });
-    next();
+    next(new errors.BadRequest('Missing id of resource'));
   }
 
   const user_id = res.locals.user_id;
@@ -17,8 +13,7 @@ const videoOwner = (req, res, next) => {
   User.findOne({ _id: user_id, videos: videoid })
     .then(user => {
       if (!user) {
-        res.status(404).json({ success: false, error: 'No such resource' });
-        next();
+        return promise.reject(new errors.NotFound());
       }
       next();
     })

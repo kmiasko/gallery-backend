@@ -1,10 +1,11 @@
+const promise = require('bluebird');
 const { verifyToken } = require('../utils');
-const { User } = require ('../models');
+const { User } = require('../models');
+const { errors } = require('../middleware');
 
 const protected = (req, res, next) => {
   if (!req.headers['x-auth']) {
-    res.status(400).json({ success: false, error: 'No authorization header' });
-    next();
+    next(new errors.BadRequest('No auth header'));
   }
 
   const token = req.headers['x-auth'];
@@ -12,16 +13,12 @@ const protected = (req, res, next) => {
     .then(() => User.findOne({ token }))
     .then(user => {
       if (!user) {
-        res.status(401).json({ success: false, error: 'Bad autorization token' });
-        next();
+        return promise.reject(new errors.Forbidden('Cant find user with that token'));
       }
       res.locals.user_id = user._id;
       next();
     })
-    .catch(() => {
-      res.status(401).json({ success: false, error: 'Bad autorization token' });
-      next();
-    });
+    .catch(err => next(err))
 };
 
 module.exports = protected;
