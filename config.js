@@ -23,6 +23,9 @@ module.exports = {
       expiresIn: '1d',
       algorithm: 'HS384',
     },
-  }
+  },
+  swagger: {
+    configFile: 'swagger.yaml',
+  },
 };
 

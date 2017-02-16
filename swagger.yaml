@@ -1,0 +1,225 @@
+swagger: "2.0"
+
+info:
+  version: 1.0.0
+  title: Gallery App API
+  description: API for Gallery App
+
+schemes:
+  - https
+host: dry-atoll-51411.herokuapp.com
+basePath: /api
+
+paths:
+  /videos:
+    get:
+      summary: Gets videos
+      description: Returns a list containing all videos for logged in user
+      responses:
+        200:
+          description: A list of Video
+          schema:
+            $ref: "#/definitions/Videos"
+    post:
+      summary: Adds new video
+      description: Adds new video and pairs it with a User (owner)
+      parameters:
+        - name: body
+          in: body
+          description: Video data
+          required: true
+          schema:
+            $ref: "#/definitions/Video"
+      responses:
+        200:
+          description: Returns video object
+          schema:
+            $ref: "#/definitions/Video"
+        401:
+          description: Authentication error
+          schema:
+            $ref: "#/definitions/Error"
+  /videos/feed:
+    get:
+      summary: Gets feed
+      description: Returns list of recently added videos
+      responses:
+        200:
+          description: A list of feed items
+          schema:
+            $ref: "#/definitions/Feed"
+  /videos/{id}:
+    put:
+      summary: Toggles a videos favorite field
+      description: Toggles a videos favorite field
+      parameters:
+        - name: id
+          in: path
+          description: id of video
+          required: true
+          type: string
+      responses:
+        200:
+          description: Toggled. Returns video.
+          schema:
+            $ref: "#/definitions/Video"
+        401:
+          description: Authentication error
+          schema:
+            $ref: "#/definitions/Error"
+    delete:
+      summary: Deletes video by specified id
+      description: Deletes video by specified id
+      parameters:
+        - name: id
+          in: path
+          description: id of video
+          required: true
+          type: string
+      responses:
+        200:
+          description: Deleted, OK.
+        401:
+          description: Authentication error
+          schema:
+            $ref: "#/definitions/Error"
+  /users:
+    post:
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      summary: Creates new user
+      description: Adds new user to users list.
+      parameters:
+        - name: body
+          in: body
+          description: New user credentials
+          required: true
+          schema:
+            $ref: "#/definitions/NewUserCredentials"
+      responses:
+        200:
+          description: User object
+          schema:
+            $ref: "#/definitions/User"
+        401:
+          description: Authentication error
+          schema:
+            $ref: "#/definitions/Error"
+  /users/login:
+    post:
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      summary: Allows user to log in
+      description: Allows user to log in returning valid token
+      parameters:
+        - name: body
+          in: body
+          description: Users credentials needed to login.
+          required: true
+          schema:
+            $ref: "#/definitions/UserLoginCredentials"
+      responses:
+        200:
+          description: Token for logged in user
+          schema:
+            $ref: "#/definitions/Token"
+        401:
+          description: Authentication error
+          schema:
+            $ref: "#/definitions/Error"
+definitions:
+  Video:
+    properties:
+      shortid:
+        description: frontend generated id of the video
+        type: string
+      title:
+        description: Video title
+        type: string
+      url:
+        description: Original url of the video
+        type: string
+      likes:
+        description: Number of video likes
+        type: integer
+        format: int64
+      views:
+        type: integer
+        description: Number of video views
+        format: int64
+      creationDate:
+        description: DateTime video was added to the database
+        type: string
+        format: date-time
+      description:
+        description: Short description of the video
+        type: string
+      embed:
+        description: HTML string of embeded video
+        type: string
+      thumbnail:
+        description: URL of video thumbnail
+        type: string
+      favorite:
+        description: Describes if the video is users favorite
+        type: boolean
+        default: false
+  Videos:
+    type: array
+    items:
+      $ref: "#/definitions/Video"
+  FeedItem:
+    properties:
+      title:
+        type: string
+      thumbnail:
+        type: string
+  Feed:
+    type: array
+    items:
+      $ref: "#/definitions/FeedItem"
+  User:
+    properties:
+      videos:
+        type: array
+        items:
+          $ref: "#/definitions/Videos"
+      username:
+        type: string
+      token:
+        type: string
+  Token:
+    properties:
+      token:
+        type: string
+  UserLoginCredentials:
+    properties:
+      username:
+        type: string
+      password:
+        type: string
+        format: password
+  NewUserCredentials:
+    properties:
+      username:
+        type: string
+      password:
+        type: string
+        format: password
+      passwordConfirmation:
+        type: string
+        format: password
+  Error:
+    required:
+      - success
+      - error
+    properties:
+      success:
+        type: boolean
+      error:
+        type: string
+      
