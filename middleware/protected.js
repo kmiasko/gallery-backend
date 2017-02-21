@@ -15,10 +15,10 @@ const protected = (req, res, next) => {
       if (!user) {
         return promise.reject(new errors.Forbidden('Cant find user with that token'));
       }
-      res.locals.user_id = user._id;
+      res.locals.user = user;
       next();
     })
-    .catch(err => next(err))
+    .catch(next);
 };
 
 module.exports = protected;

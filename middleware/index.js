@@ -1,10 +1,12 @@
 const protected = require('./protected');
-const videoOwner = require('./videoOwner');
+const checkIfVideoOwner = require('./checkIfVideoOwner');
+const checkIfBodyValid = require('./checkIfBodyValid');
 const { errorHandler, errors } = require('./errors');
 
 module.exports = {
   protected,
-  videoOwner,
+  checkIfVideoOwner,
+  checkIfBodyValid,
   errors,
   errorHandler,
 };

@@ -13,6 +13,7 @@ const {
 const {
   validateRegisterInput,
   validateLoginInput,
+  validate,
 } = require('./validations');
 
 module.exports = {
@@ -24,5 +25,6 @@ module.exports = {
   verifyToken,
   validateRegisterInput,
   validateLoginInput,
+  validate,
 };
 

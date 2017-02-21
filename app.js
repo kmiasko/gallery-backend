@@ -18,7 +18,6 @@ const { errorHandler } = require('./middleware');
 
 mongoose.Promise = promise;
 
-
 swagger()
   .then(swaggerMiddleware =>
     app
