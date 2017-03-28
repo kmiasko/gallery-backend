@@ -7,7 +7,7 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "start": "node --require dotenv/config app.js",
+    "start": "node app.js",
     "watch": "nodemon app.js --exec \"node --require dotenv/config\""
   },
   "keywords": [],
@@ -20,10 +20,13 @@
     "cors": "^2.8.1",
     "dotenv": "^4.0.0",
     "express": "^4.14.1",
+    "js-yaml": "^3.8.1",
     "jsonwebtoken": "^7.2.1",
+    "lodash": "^4.17.4",
     "mongoose": "^4.8.2",
     "morgan": "^1.8.1",
     "socket.io": "^1.7.2",
+    "swagger-tools": "^0.10.1",
     "validator": "^6.2.1"
   },
   "devDependencies": {
